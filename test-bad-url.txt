@@ -1,0 +1,1 @@
+URL which you can use to test url security checker: http://malware.testing.google.test/testing/malware/
