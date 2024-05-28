@@ -10,11 +10,10 @@ use Illuminate\Http\RedirectResponse;
 
 class UrlController extends Controller
 {
-    public function shorten(UrlRequest $request, $subdir = null): JsonResponse
+    public function shorten(UrlRequest $request, SafeBrowsingService $safeBrowsingService, $subdir = null): JsonResponse
     {
         $data = $request->validated();
 
-        $safeBrowsingService = new SafeBrowsingService();
         $matches = $safeBrowsingService->checkUrl($data['url']);
 
         if (!empty($matches)) {
