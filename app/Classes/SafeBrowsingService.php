@@ -2,8 +2,8 @@
 
 namespace App\Classes;
 
+use Exception;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 
 class SafeBrowsingService
 {
@@ -17,7 +17,7 @@ class SafeBrowsingService
     }
 
     /**
-     * @throws GuzzleException
+     * @throws Exception
      */
     public function checkUrl($url)
     {
@@ -57,7 +57,7 @@ class SafeBrowsingService
         curl_close($ch);
 
         if ($err) {
-            throw new \Exception("cURL Error: $err");
+            throw new Exception("cURL Error: $err");
         }
 
         $data = json_decode($response, true);
