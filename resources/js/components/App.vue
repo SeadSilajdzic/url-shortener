@@ -33,7 +33,6 @@
                     })
                     .catch((error) => {
                         if(error) {
-                            console.log(error)
                             this.hasErrors = true
                             this.urlError =  error.response.data.error.url[0]
                         }
