@@ -2,41 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\GenerateShortUrlService;
 use App\Models\Url;
 use App\Http\Requests\UrlRequest;
 use Illuminate\Http\JsonResponse;
-use App\Classes\SafeBrowsingService;
 use Illuminate\Http\RedirectResponse;
 
 class UrlController extends Controller
 {
-    public function shorten(UrlRequest $request, SafeBrowsingService $safeBrowsingService, $subdir = null): JsonResponse
+    public function shorten(UrlRequest $request, GenerateShortUrlService $shortUrlService): JsonResponse
     {
         $data = $request->validated();
 
-        $matches = $safeBrowsingService->checkUrl($data['url']);
-
-        if (!empty($matches)) {
-            // Handle unsafe URL
-            return response()->json([
-                'error' => [
-                    'url' => ['The URL is unsafe.']
-                ], 'matches' => $matches], 400);
+        $response = $shortUrlService->shorten($data['url']);
+        if (gettype($response) == 'object') {
+            return response()->json($response->original, 400);
         }
 
-        $subdir = !empty($subdir) ? $subdir . '/' : '';
-
-        do { // Make sure hash is unique
-            $url_hash = substr(sha1(mt_rand()),17,6);
-        } while (Url::where('url_hash', $url_hash)->exists());
-
-        $shorten = Url::firstOrCreate(
-            ['original_url' => $data['url']],
-            ['url_hash' =>  $url_hash]
-        );
+        list($subdir, $shorten) = $response;
 
         return response()->json([
-            'shortenURL' => route('redirect', $subdir . $shorten->url_hash)
+            'shortenURL' => route('redirect', $subdir . $shorten)
         ]);
     }
 
